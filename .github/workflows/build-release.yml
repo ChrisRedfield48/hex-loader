@@ -28,6 +28,7 @@ jobs:
             goarch: amd64
             bin: HexLoader
             archive: HexLoader-linux-amd64.tar.gz
+            cgo_cflags: "-DGLFW_EXPOSE_NATIVE_X11 -DGLFW_EXPOSE_NATIVE_WAYLAND=0"
 
           - os: ubuntu-latest
             target: windows-amd64
@@ -36,6 +37,7 @@ jobs:
             bin: HexLoader.exe
             archive: HexLoader-windows-amd64.zip
             cc: x86_64-w64-mingw32-gcc
+            cgo_cflags: ""
 
           - os: macos-13
             target: darwin-amd64
@@ -43,6 +45,7 @@ jobs:
             goarch: amd64
             bin: HexLoader
             archive: HexLoader-macos-amd64.tar.gz
+            cgo_cflags: ""
 
           - os: macos-14
             target: darwin-arm64
@@ -50,6 +53,7 @@ jobs:
             goarch: arm64
             bin: HexLoader
             archive: HexLoader-macos-arm64.tar.gz
+            cgo_cflags: ""
 
     steps:
       - name: Checkout
@@ -83,9 +87,9 @@ jobs:
           path: |
             ~/.cache/go-build
             ~/go/pkg/mod
-          key: ${{ runner.os }}-go-v2-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-go-v3-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-go-v2-
+            ${{ runner.os }}-go-v3-
 
       - name: Download modules
         run: go mod download
@@ -99,7 +103,7 @@ jobs:
           GOOS:   ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
           CC:     ${{ matrix.cc }}
-          CGO_CFLAGS: "-DGLFW_EXPOSE_NATIVE_X11 -DGLFW_EXPOSE_NATIVE_WAYLAND=0"
+          CGO_CFLAGS: ${{ matrix.cgo_cflags }}
         run: |
           go build -v -trimpath \
             -ldflags "-s -w" \
