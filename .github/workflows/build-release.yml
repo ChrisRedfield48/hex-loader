@@ -2,10 +2,10 @@ name: Build & Release
 
 on:
   push:
-    branches: [ main, master ]
-    tags:   [ 'v*' ]
+    branches: [ main ]
+    tags:     [ 'v*' ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
@@ -67,8 +67,14 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             libgl1-mesa-dev \
+            libglu1-mesa-dev \
+            libglx-dev \
             xorg-dev \
             libxkbcommon-dev \
+            libxkbcommon-x11-dev \
+            libwayland-dev \
+            wayland-protocols \
+            pkg-config \
             gcc-mingw-w64-x86-64
 
       - name: Cache Go modules
@@ -77,9 +83,9 @@ jobs:
           path: |
             ~/.cache/go-build
             ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          key: ${{ runner.os }}-go-v2-${{ hashFiles('**/go.sum') }}
           restore-keys: |
-            ${{ runner.os }}-go-
+            ${{ runner.os }}-go-v2-
 
       - name: Download modules
         run: go mod download
@@ -93,6 +99,7 @@ jobs:
           GOOS:   ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
           CC:     ${{ matrix.cc }}
+          CGO_CFLAGS: "-DGLFW_EXPOSE_NATIVE_X11 -DGLFW_EXPOSE_NATIVE_WAYLAND=0"
         run: |
           go build -v -trimpath \
             -ldflags "-s -w" \
