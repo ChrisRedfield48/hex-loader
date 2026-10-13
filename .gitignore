@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Go
+*.exe
+*.test
+*.out
+/HexLoader
+/HexLoader.exe
+
+# IDE
+.vscode/
+.idea/
