@@ -1,4 +1,3 @@
-```markdown
 # 📟 Hex Loader
 
 <p align="center">
